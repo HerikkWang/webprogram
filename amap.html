@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>按起终点名称规划路线</title>
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+    <style type="text/css">
+        #panel {
+            position: absolute;
+            background-color: white;
+            max-height: 90%;
+            overflow-y: auto;
+            top: 10px;
+            left:650px;
+            width: 280px;
+        }
+        #jpanel {
+            position: absolute;
+            background-color: white;
+            max-height: 90%;
+            overflow-y: auto;
+            top: 10px;
+            left: 940px;
+            width: 280px;
+        }
+		#control{
+			position: absolute;
+			top:700px;
+			left:10px;
+		}
+		#selectbox1{
+			position:absolute;
+			top:610px;
+			left:10px;
+			width:400px;
+		}		
+		#controlbox{
+			position:absolute;
+			top:650px;
+			left:10px;
+			width:500px;
+		}		
+    </style>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.4.2&key=83cab846f61620f8d6ee375800feb64e&plugin=AMap.Driving"></script>
+
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+</head>
+<body>
+<div id="container" style="width:620px;height:600px"></div>
+
+<div id="selectbox1" style="background-color:#0d9bf2">
+    <input type="checkbox"  onclick="toggleDrag(this)">允许拖拽地图
+    <input type="checkbox"  onclick="toggleKeyboard(this)">允许键盘平移
+    <input type="checkbox"  onclick="toggleDoubleClickZoom(this)">允许双击放大地图
+</div>
+
+<div id="panel"></div>
+
+<div id="controlbox">搜索地点:<input type="text" value="请输入搜索地点" id="searchtext" onclick="this.value=''">
+	<button onclick="searchplace()">搜索</button>
+	<button onclick="clearMap()">清空地图</button>
+	<br>
+	起点: <input type="text" style="width:90px" value="请输入起点" id="startspot" onclick="this.value=''">
+	起点城市: <input type="text" style="width:55px" value="输入城市" id="startcity" onclick="this.value=''">
+	<br>
+	终点: <input type="text" style="width:90px" value="请输入终点" id="endspot" onclick="this.value=''">
+	终点城市: <input type="text" style="width:55px" value="输入城市" id="endcity" onclick="this.value=''">
+	<button onclick="searchroute()">驾车路线规划</button>
+</div>
+
+
+<div id="jpanel"></div>
+<script type="text/javascript">
+    //基本地图加载
+    var map = new AMap.Map("container", {
+        resizeEnable: true,
+		resizeEnable: true,
+		dragEnable:false,
+		keyboardEnable:false,
+		doubleClickZoom:false,
+        center: [120.09677,30.30983],//地图中心点
+        zoom: 13 //地图显示的缩放级别
+    });
+    function searchroute(){
+    var driving = new AMap.Driving({
+        map: map,
+        panel: "panel"
+    }); 
+    // 根据起终点名称规划驾车导航路线
+    driving.search([
+        {keyword: document.getElementById('startspot').value,city:document.getElementById('startcity').value},
+        {keyword: document.getElementById('endspot').value,city:document.getElementById('endcity').value}
+    ]);}
+    
+	function toggleDrag(checkbox) {
+        if (checkbox.checked) {
+            map.setStatus({dragEnable: true});
+        } else {
+            map.setStatus({dragEnable: false});
+        }
+    }
+    
+	function toggleKeyboard(checkbox) {
+        if (checkbox.checked) {
+            map.setStatus({keyboardEnable: true});
+        } else {
+            map.setStatus({keyboardEnable: false});
+        }
+    }
+    
+	function toggleDoubleClickZoom(checkbox) {
+        if (checkbox.checked) {
+            map.setStatus({doubleClickZoom: true});
+        } else {
+            map.setStatus({doubleClickZoom: false});
+        }
+    }
+	
+	function searchplace(){
+    AMap.service(["AMap.PlaceSearch"], function() {
+        var placeSearch = new AMap.PlaceSearch({ //构造地点查询类
+            pageSize: 5,
+            pageIndex: 1,
+            city: "010", //城市
+            map: map,
+            panel: "jpanel"
+        });
+        //关键字查询
+        placeSearch.search(document.getElementById('searchtext').value);
+    });
+	}
+	
+	function clearMap(){
+		map.clearMap();
+	}
+</script>
+</body>
+</html>
